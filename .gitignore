@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.env
+adapters/
+data/
+outputs/
+hf_cache/
+*.pt
+*.safetensors
+*.bin
+.vscode/
+Thumbs.db
