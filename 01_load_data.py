@@ -5,7 +5,7 @@ Loads JBB-Behaviors from HuggingFace, takes a stratified sample of
 N_BEHAVIORS harmful + N_BENIGN benign behaviors, and saves to data/behaviors.json.
 
 This file is the single source of truth for all downstream scripts.
-Run this once. Don't re-run it unless you want to change the sample.
+Run this ONCE. Don't re-run it unless you want to change the sample.
 """
 import json
 import random

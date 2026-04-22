@@ -1,6 +1,6 @@
 """
 Phase 0 smoke test.
-Confirms GPU, Gemini API, and Phi-3 loading all work before we write any real code.
+Confirms GPU, OpenAI API, and Phi-3 loading all work before we write any real code.
 """
 import os
 from dotenv import load_dotenv
