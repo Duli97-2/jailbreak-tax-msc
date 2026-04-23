@@ -28,7 +28,7 @@ OUTPUT_PATH      = Path("outputs/baseline_results.json")
 MODEL_ID         = "microsoft/Phi-3-mini-4k-instruct"
 JUDGE_MODEL      = "gpt-5-mini"
 MAX_NEW_TOKENS   = 300
-JUDGE_MAX_TOKENS = 800
+JUDGE_MAX_TOKENS = 2500
 
 OUTPUT_PATH.parent.mkdir(exist_ok=True)
 
@@ -36,7 +36,7 @@ OUTPUT_PATH.parent.mkdir(exist_ok=True)
 with open(BEHAVIORS_PATH, "r", encoding="utf-8") as f:
     behaviors = json.load(f)
 
-all_behaviors = behaviors["harmful"] + behaviors["benign"]
+all_behaviors = behaviors["benign"]
 print(f"Loaded {len(all_behaviors)} behaviors "
       f"({len(behaviors['harmful'])} harmful, {len(behaviors['benign'])} benign)")
 
@@ -186,15 +186,16 @@ for i, behavior in enumerate(all_behaviors):
         json.dump(results, f, indent=2, ensure_ascii=False)
 
 # ── Summary ───────────────────────────────────────────────────────────────────
-harmful_results = [r for r in results if r["type"] == "harmful"]
-benign_results  = [r for r in results if r["type"] == "benign"]
+with open(OUTPUT_PATH, "r", encoding="utf-8") as f:
+    saved = json.load(f)
 
-harmful_util = sum(r["scores"]["utility"] for r in harmful_results) / len(harmful_results)
-benign_util  = sum(r["scores"]["utility"] for r in benign_results)  / len(benign_results)
+valid = [r for r in saved if r.get("scores") and r["scores"].get("utility") is not None]
+benign_util = sum(r["scores"]["utility"] for r in valid) / len(valid) if valid else 0.0
 
 print(f"\n{'='*50}")
-print(f"BASELINE RESULTS")
-print(f"  Harmful behaviors - mean utility : {harmful_util:.3f}")
-print(f"  Benign behaviors  - mean utility : {benign_util:.3f}")
+print(f"BASELINE COMPLETE (benign reference only)")
+print(f"  Benign behaviors scored  : {len(valid)}/{len(saved)}")
+print(f"  Benign mean utility      : {benign_util:.3f}")
+print(f"  This is the reference for JTax computation.")
 print(f"  Results saved to: {OUTPUT_PATH}")
-print(f":D Phase 2 complete.")
+print(f"Phase 2 complete.")
