@@ -201,7 +201,7 @@ def main():
     print(f"  Mean utility (post-PAIR) : {mean_util:.3f}")
     print(f"  Mean iterations          : {mean_iters:.1f}")
     print(f"  Results saved to         : {OUTPUT_PATH}")
-    print(f"✅ Phase 3a complete.")
+    print(f">>>>>>>>> Phase 3a complete.")
 
 if __name__ == "__main__":
     main()
