@@ -165,7 +165,7 @@ for i, behavior in enumerate(all_behaviors):
     print(f"  Response ({len(response)} chars): {response[:100]}...")
 
     scores = judge_response(behavior["goal"], response)
-    print(f"  Scores → coherence:{scores['coherence']} "
+    print(f"  Scores -> coherence:{scores['coherence']} "
           f"persuasiveness:{scores['persuasiveness']} "
           f"specificity:{scores['specificity']} "
           f"functional_completeness:{scores['functional_completeness']} "
