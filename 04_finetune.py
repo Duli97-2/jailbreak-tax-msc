@@ -22,7 +22,7 @@ from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 from trl import SFTTrainer, SFTConfig
 from datasets import Dataset
 
-# ── Config ────────────────────────────────────────────────────────────────────
+##### Config #####
 MODEL_ID       = "microsoft/Phi-3-mini-4k-instruct"
 DATA_PATH      = Path("data/finetune_data.json")
 OUTPUT_DIR     = Path("outputs/lora_adapter")
@@ -44,7 +44,7 @@ LOGGING_STEPS       = 5
 
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# ── Load tokenizer and model ──────────────────────────────────────────────────
+##### Load tokenizer and model #####
 print("Loading tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, trust_remote_code=True)
 tokenizer.pad_token = tokenizer.unk_token
@@ -72,7 +72,7 @@ model.config.pretraining_tp = 1
 model = prepare_model_for_kbit_training(model)
 print(f"Base model VRAM: {torch.cuda.memory_allocated(0)/1e9:.2f} GB")
 
-# ── Attach LoRA adapter ───────────────────────────────────────────────────────
+##### Attach LoRA adapter #####
 lora_config = LoraConfig(
     r=LORA_R,
     lora_alpha=LORA_ALPHA,
@@ -84,7 +84,7 @@ lora_config = LoraConfig(
 model = get_peft_model(model, lora_config)
 model.print_trainable_parameters()
 
-# ── Load and format data ──────────────────────────────────────────────────────
+##### Load and format data #####
 print(f"\nLoading fine-tune dataset from {DATA_PATH}...")
 with open(DATA_PATH, "r", encoding="utf-8") as f:
     raw_data = json.load(f)
@@ -110,7 +110,7 @@ dataset = Dataset.from_list(raw_data)
 dataset = dataset.map(format_example, remove_columns=dataset.column_names)
 print(f"\n  Sample formatted entry (first 200 chars):\n  {dataset[0]['text'][:200]}...")
 
-# ── Training config ───────────────────────────────────────────────────────────
+##### Training config #####
 sft_config = SFTConfig(
     output_dir=str(OUTPUT_DIR),
     num_train_epochs=EPOCHS,
@@ -132,7 +132,7 @@ sft_config = SFTConfig(
     gradient_checkpointing_kwargs={"use_reentrant": False},
 )
 
-# ── Trainer ───────────────────────────────────────────────────────────────────
+##### Trainer #####
 trainer = SFTTrainer(
     model=model,
     args=sft_config,
@@ -151,7 +151,7 @@ print(f"{'='*50}\n")
 
 trainer.train()
 
-# ── Save final adapter ────────────────────────────────────────────────────────
+##### Save final adapter #####
 final_path = OUTPUT_DIR / "final"
 trainer.model.save_pretrained(str(final_path))
 tokenizer.save_pretrained(str(final_path))

@@ -5,7 +5,7 @@ Loads Phi-3-Mini with the trained LoRA adapter and runs inference on all
 40 harmful behaviors from the evaluation set. Scores outputs with GPT-5-mini
 using the same 4-dim rubric as baseline and PAIR.
 
-This gives us JailUtil_LoRA to compare against JailUtil_PAIR in Phase 6.
+This gives us JailUtil_LoRA to compare against JailUtil_PAIR.
 """
 import json
 import torch
@@ -14,13 +14,13 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from peft import PeftModel
 from attack_utils import judge_response, compute_utility, save_results, load_behaviors
 
-# ── Config ────────────────────────────────────────────────────────────────────
+##### Config #####
 MODEL_ID      = "microsoft/Phi-3-mini-4k-instruct"
 ADAPTER_PATH  = Path("outputs/lora_adapter/final")
 OUTPUT_PATH   = Path("outputs/lora_results.json")
 MAX_NEW_TOKENS = 300
 
-# ── Load model + adapter ──────────────────────────────────────────────────────
+##### Load model + adapter #####
 print("Loading tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, trust_remote_code=True)
 tokenizer.pad_token = tokenizer.unk_token
@@ -45,12 +45,12 @@ model = PeftModel.from_pretrained(base_model, str(ADAPTER_PATH))
 model.eval()
 print(f"✓ Model + adapter loaded. VRAM: {torch.cuda.memory_allocated(0)/1e9:.2f} GB")
 
-# ── Load behaviors ────────────────────────────────────────────────────────────
+##### Load behaviors #####
 behaviors = load_behaviors()
 harmful   = behaviors["harmful"]
 print(f"\nEvaluating on {len(harmful)} harmful behaviors...")
 
-# ── Generate and judge ────────────────────────────────────────────────────────
+##### Generate and judge #####
 results = []
 
 for i, behavior in enumerate(harmful):
@@ -100,7 +100,7 @@ for i, behavior in enumerate(harmful):
 
     save_results(results, OUTPUT_PATH)
 
-# ── Summary ───────────────────────────────────────────────────────────────────
+##### Summary #####
 mean_util  = sum(r["utility"] for r in results) / len(results)
 jbb_util   = sum(r["utility"] for r in results if r["source"] == "JBB") / max(1, sum(1 for r in results if r["source"] == "JBB"))
 mal_util   = sum(r["utility"] for r in results if r["source"] == "manual_malware") / max(1, sum(1 for r in results if r["source"] == "manual_malware"))

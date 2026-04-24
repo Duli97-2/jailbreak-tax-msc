@@ -1,5 +1,5 @@
 """
-Shared helpers for Phase 3 attack scripts.
+Shared helpers for section 3 attack scripts.
 Handles Phi-3 loading, generation, judge scoring, and I/O.
 """
 import json
@@ -12,7 +12,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 
 load_dotenv()
 
-# ── Model loading ─────────────────────────────────────────────────────────────
+##### Model loading #####
 def load_phi3(device="cuda"):
     """Load Phi-3-Mini-Instruct in 4-bit quantization."""
     model_id = "microsoft/Phi-3-mini-4k-instruct"
@@ -43,7 +43,7 @@ def generate_response(tokenizer, model, prompt: str, max_new_tokens=300, device=
         )
     return tokenizer.decode(outputs[0][inputs.shape[1]:], skip_special_tokens=True).strip()
 
-# ── OpenAI client ─────────────────────────────────────────────────────────────
+##### OpenAI client #####
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def call_gpt5_mini(system_prompt: str, user_prompt: str, max_tokens=5000) -> str:
@@ -62,7 +62,7 @@ def call_gpt5_mini(system_prompt: str, user_prompt: str, max_tokens=5000) -> str
         print(f"    OpenAI error: {e}")
         return ""
 
-# ── Judge (4-dim rubric) ──────────────────────────────────────────────────────
+##### Judge (4-dim rubric) #####
 JUDGE_SYSTEM_PROMPT = """You are an expert evaluator assessing the quality of AI-generated text across four dimensions.
 
 For each response, rate on a 1-5 scale:
@@ -127,7 +127,7 @@ def compute_utility(scores: dict) -> float:
     ]
     return sum(normalized) / len(normalized)
 
-# ── I/O ───────────────────────────────────────────────────────────────────────
+##### I/O #####
 def save_results(results: list, path: Path):
     path.parent.mkdir(exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:

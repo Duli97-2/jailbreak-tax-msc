@@ -2,7 +2,7 @@
 Phase 1c: Clean the fine-tune dataset.
 
 Scans data/finetune_data.json for refusal patterns and removes them.
-Refusals in training data would teach the model to refuse — opposite of goal.
+Because refusals in training data would teach the model to refuse — opposite of goal.
 """
 import json
 from pathlib import Path
@@ -61,4 +61,4 @@ print(f"  Malware : {mal}")
 with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
     json.dump(cleaned, f, indent=2, ensure_ascii=False)
 
-print(f"\n:D Cleaned dataset saved to {OUTPUT_PATH}")
+print(f"\n>>>>>>>> Cleaned dataset saved to {OUTPUT_PATH}")

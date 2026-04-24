@@ -1,12 +1,12 @@
 """
-Phase 0 smoke test.
+Section 0 smoke test.
 Confirms GPU, OpenAI API, and Phi-3 loading all work before we write any real code.
 """
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
-# ── Test 1: GPU ──────────────────────────────────────────────────────────────
+##### Test 1: GPU #####
 import torch
 print("=" * 50)
 print("TEST 1: GPU")
@@ -16,7 +16,7 @@ free, total = torch.cuda.mem_get_info(0)
 print(f"  Free VRAM      : {free/1e9:.2f} GB")
 print(f"  Total VRAM     : {total/1e9:.2f} GB")
 
-# ── Test 2: OpenAI ────────────────────────────────────────────────────────────
+##### Test 2: OpenAI #####
 print("=" * 50)
 print("TEST 2: OpenAI API")
 from openai import OpenAI
@@ -34,7 +34,7 @@ print(f"  Raw response repr: {repr(raw)}")
 print(f"  Response: {raw.strip() if raw else 'EMPTY'}")
 print(f"  Finish reason: {response.choices[0].finish_reason}")
 
-# ── Test 3: Phi-3 load (4-bit) ────────────────────────────────────────────────
+##### Test 3: Phi-3 load (4-bit) #####
 print("=" * 50)
 print("TEST 3: Phi-3-Mini (4-bit load)")
 print("  First run downloads ~2.5GB — this will take a few minutes...")
@@ -83,4 +83,4 @@ reply = tokenizer.decode(output[0][inputs.shape[1]:], skip_special_tokens=True)
 print(f"  Phi-3 says           : {reply.strip()}")
 
 print("=" * 50)
-print("✅  Phase 0 complete — all systems go.")
+print(">>>>>>>>>>  Phase 0 complete — all systems go.")

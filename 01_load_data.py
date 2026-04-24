@@ -3,7 +3,7 @@ Phase 1: Load and prepare the evaluation dataset.
 
 Evaluation set (used for baseline, post-PAIR, post-LoRA):
   - 30 JBB harmful behaviors (stratified across 10 categories)
-  - 10 hand-curated malware/code-producing prompts
+  - 10 hand-curated malware/code-producing prompts (inspired by CyberLLMInstruct)
   - 30 JBB benign behaviors (control)
 
 Total: 70 behaviors saved to data/behaviors.json
@@ -14,12 +14,12 @@ from pathlib import Path
 from collections import defaultdict
 from datasets import load_dataset
 
-# ── Config ────────────────────────────────────────────────────────────────────
+#####  Config #####
 N_PER_CATEGORY = 3        # 10 JBB categories × 3 = 30 harmful
 RANDOM_SEED    = 42
 OUTPUT_PATH    = Path("data/behaviors.json")
 
-# ── 10 hand-curated malware eval prompts ──────────────────────────────────────
+##### 10 hand-curated malware eval prompts #####
 # Disjoint from the 15 fine-tune malware prompts to prevent leakage.
 # Chosen to cover diverse malware subdomains and elicit code responses.
 MALWARE_EVAL_PROMPTS = [
@@ -75,7 +75,7 @@ MALWARE_EVAL_PROMPTS = [
     },
 ]
 
-# ── Load JBB ──────────────────────────────────────────────────────────────────
+##### Load JBB #####
 print("Loading JailbreakBench harmful behaviors...")
 harmful_ds = load_dataset("JailbreakBench/JBB-Behaviors", "behaviors", split="harmful")
 print(f"  Total harmful available: {len(harmful_ds)}")
@@ -84,7 +84,7 @@ print("Loading JailbreakBench benign behaviors...")
 benign_ds = load_dataset("JailbreakBench/JBB-Behaviors", "behaviors", split="benign")
 print(f"  Total benign available: {len(benign_ds)}")
 
-# ── Stratified sample of JBB harmful ──────────────────────────────────────────
+##### Stratified sample of JBB harmful #####
 random.seed(RANDOM_SEED)
 
 by_category = defaultdict(list)
@@ -99,12 +99,12 @@ for category, items in by_category.items():
 print(f"\nJBB harmful sampled  : {len(jbb_harmful_sample)}")
 print(f"Malware eval prompts : {len(MALWARE_EVAL_PROMPTS)}")
 
-# ── Sample JBB benign (30, matched count for JBB harmful) ─────────────────────
+##### Sample JBB benign (30, matched count for JBB harmful) #####
 benign_list   = list(benign_ds)
 benign_sample = random.sample(benign_list, min(len(jbb_harmful_sample), len(benign_list)))
 print(f"JBB benign sampled   : {len(benign_sample)}")
 
-# ── Build clean output ────────────────────────────────────────────────────────
+##### Build clean output #####
 def clean_jbb_harmful(item):
     return {
         "id":       item["Behavior"],
@@ -143,12 +143,12 @@ output = {
     "benign":  [clean_benign(i) for i in benign_sample],
 }
 
-# ── Save ──────────────────────────────────────────────────────────────────────
+##### Save #####
 OUTPUT_PATH.parent.mkdir(exist_ok=True)
 with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
     json.dump(output, f, indent=2, ensure_ascii=False)
 
-# ── Summary ───────────────────────────────────────────────────────────────────
+##### Summary #####
 print(f"\n{'='*50}")
 print(f"Evaluation set saved to {OUTPUT_PATH}")
 print(f"  JBB harmful        : {len(jbb_harmful_sample)}")

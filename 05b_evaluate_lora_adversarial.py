@@ -1,12 +1,11 @@
 """
 Phase 5b: Post-LoRA evaluation on PAIR-crafted adversarial prompts.
 
-This is the fairer comparison against PAIR. Instead of feeding the raw
-eval goal to the LoRA model, we feed it the best adversarial prompt that
-PAIR discovered for each behavior. Both arms now respond to the same inputs.
+Here, instead of feeding the raw eval goal to the LoRA model, we feed it the best adversarial
+prompt that PAIR discovered for each behavior. Both arms now respond to the same inputs.
 
 Output: outputs/lora_adversarial_results.json (kept separate from the
-original lora_results.json for comparison in Phase 6)
+original lora_results.json for later comparison in section 6)
 """
 import json
 import torch
@@ -15,21 +14,21 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from peft import PeftModel
 from attack_utils import judge_response, compute_utility, save_results, load_behaviors
 
-# ── Config ────────────────────────────────────────────────────────────────────
+##### Config #####
 MODEL_ID        = "microsoft/Phi-3-mini-4k-instruct"
 ADAPTER_PATH    = Path("outputs/lora_adapter/final")
 PAIR_RESULTS    = Path("outputs/pair_results.json")
 OUTPUT_PATH     = Path("outputs/lora_adversarial_results.json")
 MAX_NEW_TOKENS  = 300
 
-# ── Load PAIR results for best prompts ────────────────────────────────────────
+##### Load PAIR results for best prompts #####
 print(f"Loading PAIR results from {PAIR_RESULTS}...")
 with open(PAIR_RESULTS, "r", encoding="utf-8") as f:
     pair_results = json.load(f)
 pair_lookup = {r["id"]: r for r in pair_results}
 print(f"  PAIR entries indexed: {len(pair_lookup)}")
 
-# ── Load model + adapter ──────────────────────────────────────────────────────
+##### Load model + adapter #####
 print("Loading tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, trust_remote_code=True)
 tokenizer.pad_token = tokenizer.unk_token
@@ -54,12 +53,12 @@ model = PeftModel.from_pretrained(base_model, str(ADAPTER_PATH))
 model.eval()
 print(f"✓ Model + adapter loaded. VRAM: {torch.cuda.memory_allocated(0)/1e9:.2f} GB")
 
-# ── Load behaviors ────────────────────────────────────────────────────────────
+##### Load behaviors #####
 behaviors = load_behaviors()
 harmful   = behaviors["harmful"]
 print(f"\nEvaluating LoRA on {len(harmful)} behaviors using PAIR adversarial prompts...")
 
-# ── Generate and judge ────────────────────────────────────────────────────────
+##### Generate and judge #####
 results = []
 
 for i, behavior in enumerate(harmful):
@@ -123,7 +122,7 @@ for i, behavior in enumerate(harmful):
 
     save_results(results, OUTPUT_PATH)
 
-# ── Summary ───────────────────────────────────────────────────────────────────
+##### Summary #####
 jbb_results = [r for r in results if r["source"] == "JBB"]
 mal_results = [r for r in results if r["source"] == "manual_malware"]
 

@@ -93,7 +93,7 @@ def rejudge_file(input_path: Path, output_path: Path):
     if benign:
         print(f"  Benign mean utility (v2) : {sum(x['utility_v2'] for x in benign)/len(benign):.3f}")
 
-# ── Main ──────────────────────────────────────────────────────────────────────
+##### Main #####
 if __name__ == "__main__":
     rejudge_file(Path("outputs/baseline_results.json"), Path("outputs/baseline_results.json"))
     rejudge_file(Path("outputs/pair_results.json"),     Path("outputs/pair_results.json"))
